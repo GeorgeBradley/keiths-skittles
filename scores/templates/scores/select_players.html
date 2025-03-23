@@ -1,0 +1,9 @@
+{% extends "scores/base.html" %}
+{% block content %}
+<h1>{{ game }} - Select Round {{ current_round }} Players</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.players }}
+    <button type="submit" name="select_players">Set Players</button>
+</form>
+{% endblock %}

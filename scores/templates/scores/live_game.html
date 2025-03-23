@@ -1,0 +1,40 @@
+{% extends "scores/base.html" %}
+{% block content %}
+<h1>{{ game }} - Round {{ current_round }}, Cycle {{ current_cycle }}</h1>
+<h2>Keith’s Team (Cycle: {{ keiths_cycle_total }} | Round: {{ keiths_round_total }} | Game: {{ keiths_game_total }})</h2>
+<table border="1">
+    <tr><th>#</th><th>Player</th><th>Roll 1</th><th>Roll 2</th><th>Roll 3</th><th>Total</th></tr>
+    {% for score in keiths_scores %}
+    <tr>
+        <td>{{ forloop.counter }}</td><td>{{ score.player.name }}</td>
+        <td>{{ score.roll_1 }}</td><td>{{ score.roll_2 }}</td><td>{{ score.roll_3 }}</td>
+        <td>{{ score.total_score }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h2>{{ game.opponent }} (Cycle: {{ opp_cycle_total }} | Round: {{ opp_round_total }} | Game: {{ opp_game_total }})</h2>
+<table border="1">
+    <tr><th>#</th><th>Player</th><th>Roll 1</th><th>Roll 2</th><th>Roll 3</th><th>Total</th></tr>
+    {% for score in opp_scores %}
+    <tr>
+        <td>{{ score.opponent_player_number }}</td><td>{{ game.opponent }} P{{ score.opponent_player_number }}</td>
+        <td>{{ score.roll_1 }}</td><td>{{ score.roll_2 }}</td><td>{{ score.roll_3 }}</td>
+        <td>{{ score.total_score }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<form method="post">
+    {% csrf_token %}
+    <label>Keith’s Player:</label> {{ form.player }}
+    <label>{{ game.opponent }} Player:</label> {{ form.opponent_player_number }}
+    <label>Roll 1:</label> {{ form.roll_1 }}
+    <label>Roll 2:</label> {{ form.roll_2 }}
+    <label>Roll 3:</label> {{ form.roll_3 }}
+    {% if game.game_type == "first_pin" %}
+        <label>First Pin Hits:</label> {{ form.first_pin_success }}
+    {% endif %}
+    <button type="submit">Add</button>
+</form>
+{% endblock %}
