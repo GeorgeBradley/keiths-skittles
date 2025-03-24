@@ -36,6 +36,12 @@ class PlayerSelectForm(forms.ModelForm):
         model = GamePlayer
         fields = []
 
+    def clean_players(self):
+        players = self.cleaned_data.get('players')
+        if not players:
+            raise forms.ValidationError("You must select at least one player.")
+        return players
+
 class PlayerForm(forms.ModelForm):
     class Meta:
         model = Player
@@ -46,7 +52,7 @@ class GameSetupForm(forms.ModelForm):
 
     class Meta:
         model = Game
-        fields = ['date', 'opponent', 'location', 'game_type', 'cycles_per_round']
+        fields = ['date', 'opponent', 'location', 'game_type', 'cycles_per_round', 'first_team']
         widgets = {
             'date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }

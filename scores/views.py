@@ -54,6 +54,18 @@ def live_game(request, game_id=None):
         else:
             expected_players.append(("opponent", i + 1))  # Opponent player
             expected_players.append(("keith", i + 1))  # Keith's player
+
+    # Check if round_player_ids is empty to avoid division by zero
+    if not round_player_ids:
+        print("No players selected for this round. Redirecting to player selection.")
+        return render(request, "scores/select_players.html", {
+            "game": game,
+            "players": Player.objects.all(),
+            "current_round": current_round,
+            "form": PlayerSelectForm(),
+            "error": "Please select at least one player for this round."
+        })
+
     current_position = len(current_scores) % (len(round_player_ids) * 2)
     if current_position < len(expected_players):
         next_team, next_position = expected_players[current_position]
@@ -76,11 +88,15 @@ def live_game(request, game_id=None):
             form = PlayerSelectForm(request.POST)
             if form.is_valid():
                 GamePlayer.objects.filter(game=game, round_number=current_round).delete()
-                for player in form.cleaned_data["players"]:
+                selected_players = form.cleaned_data["players"]
+                print("Selected Players:", selected_players)  # Debug
+                for player in selected_players:
                     GamePlayer.objects.create(game=game, player=player, round_number=current_round)
+                print("GamePlayers after save:", list(GamePlayer.objects.filter(game=game, round_number=current_round).values()))  # Debug
                 return redirect("live_game", game_id=game.id)
             else:
                 print("PlayerSelectForm errors:", form.errors)
+                print("Form data:", request.POST)
         else:
             form = ScoreForm(request.POST)
             if form.is_valid():
@@ -91,10 +107,11 @@ def live_game(request, game_id=None):
                 if not score.player:
                     score.opponent_player_number = form.cleaned_data["opponent_player_number"]
                 score.save()
-                print("Saved Score:", score.roll_1, score.roll_2, score.roll_3, score.total_score)
+                print("Saved Score - Game ID:", score.game.id, "Round:", score.round_number, "Cycle:", score.cycle_number, "Player:", score.player, "Opponent Player:", score.opponent_player_number, "Rolls:", score.roll_1, score.roll_2, score.roll_3, "Total:", score.total_score)
                 return redirect("live_game", game_id=game.id)
             else:
                 print("ScoreForm errors:", form.errors)
+                print("Form data:", request.POST)
     else:
         form = ScoreForm(initial={"game": game, "round_number": current_round, "cycle_number": current_cycle})
         if next_team == "keith":

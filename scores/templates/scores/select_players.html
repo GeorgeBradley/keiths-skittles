@@ -1,8 +1,22 @@
 {% extends "scores/base.html" %}
 {% block content %}
 <h1>{{ game }} - Select Round {{ current_round }} Players</h1>
+{% if error %}
+<div class="alert alert-danger">
+    {{ error }}
+</div>
+{% endif %}
 <form method="post" class="mb-4">
     {% csrf_token %}
+    {% if form.errors %}
+    <div class="alert alert-danger">
+        <ul>
+            {% for field, errors in form.errors.items %}
+            <li>{{ field }}: {{ errors }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
     <div class="mb-3">
         <label class="form-label">Select Players:</label>
         {{ form.players }}
