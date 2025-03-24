@@ -35,6 +35,7 @@ def live_game(request, game_id=None):
     current_cycle = min(game.cycles_per_round, (scores.filter(round_number=current_round).aggregate(Max("cycle_number"))["cycle_number__max"] or 0) + 1)
 
     round_players = GamePlayer.objects.filter(game=game, round_number=current_round)
+    print("Round Players (before form submission):", list(round_players.values()))  # Debug
     if not round_players and request.method != "POST":
         return render(request, "scores/select_players.html", {
             "game": game,
@@ -85,11 +86,12 @@ def live_game(request, game_id=None):
 
     if request.method == "POST":
         if "select_players" in request.POST:
+            print("Received POST data for player selection:", request.POST)  # Debug
             form = PlayerSelectForm(request.POST)
             if form.is_valid():
                 GamePlayer.objects.filter(game=game, round_number=current_round).delete()
                 selected_players = form.cleaned_data["players"]
-                print("Selected Players:", selected_players)  # Debug
+                print("Selected Players after validation:", selected_players)  # Debug
                 for player in selected_players:
                     GamePlayer.objects.create(game=game, player=player, round_number=current_round)
                 print("GamePlayers after save:", list(GamePlayer.objects.filter(game=game, round_number=current_round).values()))  # Debug
@@ -97,6 +99,13 @@ def live_game(request, game_id=None):
             else:
                 print("PlayerSelectForm errors:", form.errors)
                 print("Form data:", request.POST)
+                return render(request, "scores/select_players.html", {
+                    "game": game,
+                    "players": Player.objects.all(),
+                    "current_round": current_round,
+                    "form": form,
+                    "error": "Form validation failed. Please ensure you selected at least one player."
+                })
         else:
             form = ScoreForm(request.POST)
             if form.is_valid():

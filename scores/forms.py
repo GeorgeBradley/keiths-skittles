@@ -38,6 +38,7 @@ class PlayerSelectForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        print("Player Queryset:", list(self.fields['players'].queryset.values()))  # Debug
         # Ensure players field is treated as a list
         if 'players' in self.data and isinstance(self.data['players'], str):
             self.data = self.data.copy()
