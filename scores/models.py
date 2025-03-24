@@ -6,6 +6,7 @@ class Game(models.Model):
     location = models.CharField(max_length=100)
     game_type = models.CharField(max_length=10, choices=[("regular", "Regular"), ("first_pin", "First Pin")], default="regular")
     cycles_per_round = models.IntegerField(default=4)
+    first_team = models.CharField(max_length=10, choices=[('keith', 'Keith’s Team'), ('opponent', 'Opponent Team')], default='keith')
 
     def __str__(self):
         return f"{self.date} vs {self.opponent}"

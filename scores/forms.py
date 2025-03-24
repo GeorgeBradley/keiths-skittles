@@ -1,5 +1,5 @@
 from django import forms
-from .models import Score, Player, GamePlayer
+from .models import Score, Player, GamePlayer, Game
 
 class ScoreForm(forms.ModelForm):
     player = forms.ModelChoiceField(queryset=Player.objects.all(), empty_label="Select Keith’s Player", required=False)
@@ -40,3 +40,13 @@ class PlayerForm(forms.ModelForm):
     class Meta:
         model = Player
         fields = ['name']
+
+class GameSetupForm(forms.ModelForm):
+    first_team = forms.ChoiceField(choices=[('keith', 'Keith’s Team'), ('opponent', 'Opponent Team')], label="Which team goes first?")
+
+    class Meta:
+        model = Game
+        fields = ['date', 'opponent', 'location', 'game_type', 'cycles_per_round']
+        widgets = {
+            'date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        }
