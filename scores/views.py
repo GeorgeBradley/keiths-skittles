@@ -90,8 +90,11 @@ def live_game(request, game_id=None):
             form = PlayerSelectForm(request.POST)
             if form.is_valid():
                 GamePlayer.objects.filter(game=game, round_number=current_round).delete()
-                selected_players = form.cleaned_data["players"]
-                print("Selected Players after validation:", selected_players)  # Debug
+                selected_player_ids = form.cleaned_data["players"]
+                print("Selected Player IDs after validation:", selected_player_ids)  # Debug
+                # Convert player IDs to Player objects
+                selected_players = Player.objects.filter(id__in=selected_player_ids)
+                print("Selected Players (objects):", list(selected_players.values()))  # Debug
                 for player in selected_players:
                     GamePlayer.objects.create(game=game, player=player, round_number=current_round)
                 print("GamePlayers after save:", list(GamePlayer.objects.filter(game=game, round_number=current_round).values()))  # Debug

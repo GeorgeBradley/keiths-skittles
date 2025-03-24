@@ -29,16 +29,16 @@ class ScoreForm(forms.ModelForm):
 
         return cleaned_data
 
-class PlayerSelectForm(forms.ModelForm):
-    players = forms.ModelMultipleChoiceField(queryset=Player.objects.all(), widget=forms.CheckboxSelectMultiple)
-
-    class Meta:
-        model = GamePlayer
-        fields = []
+class PlayerSelectForm(forms.Form):  # Changed to a regular Form instead of ModelForm
+    players = forms.MultipleChoiceField(
+        choices=[(player.id, player.name) for player in Player.objects.all()],
+        widget=forms.CheckboxSelectMultiple,
+        required=True
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        print("Player Queryset:", list(self.fields['players'].queryset.values()))  # Debug
+        print("Player Choices:", self.fields['players'].choices)  # Debug
         # Ensure players field is treated as a list
         if 'players' in self.data and isinstance(self.data['players'], str):
             self.data = self.data.copy()
