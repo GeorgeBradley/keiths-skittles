@@ -13,10 +13,20 @@ class ScoreForm(forms.ModelForm):
         cleaned_data = super().clean()
         player = cleaned_data.get("player")
         opp_num = cleaned_data.get("opponent_player_number")
+        roll_1 = cleaned_data.get("roll_1", 0)
+        roll_2 = cleaned_data.get("roll_2", 0)
+        roll_3 = cleaned_data.get("roll_3", 0)
+
         if player and opp_num:
             raise forms.ValidationError("Choose either Keith’s player or an opponent player, not both.")
         if not player and not opp_num:
             raise forms.ValidationError("Select a player or opponent number.")
+
+        max_pins = 9
+        for roll, value in [("Roll 1", roll_1), ("Roll 2", roll_2), ("Roll 3", roll_3)]:
+            if value < 0 or value > max_pins:
+                raise forms.ValidationError(f"{roll} must be between 0 and {max_pins}.")
+
         return cleaned_data
 
 class PlayerSelectForm(forms.ModelForm):
@@ -25,3 +35,8 @@ class PlayerSelectForm(forms.ModelForm):
     class Meta:
         model = GamePlayer
         fields = []
+
+class PlayerForm(forms.ModelForm):
+    class Meta:
+        model = Player
+        fields = ['name']

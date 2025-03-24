@@ -1,40 +1,108 @@
 {% extends "scores/base.html" %}
 {% block content %}
 <h1>{{ game }} - Round {{ current_round }}, Cycle {{ current_cycle }}</h1>
+<p class="lead">Score: Keith’s Team {{ keiths_game_total }} - {{ game.opponent }} {{ opp_game_total }} ({{ score_differential|default:0 }})</p>
+
 <h2>Keith’s Team (Cycle: {{ keiths_cycle_total }} | Round: {{ keiths_round_total }} | Game: {{ keiths_game_total }})</h2>
-<table border="1">
-    <tr><th>#</th><th>Player</th><th>Roll 1</th><th>Roll 2</th><th>Roll 3</th><th>Total</th></tr>
-    {% for score in keiths_scores %}
-    <tr>
-        <td>{{ forloop.counter }}</td><td>{{ score.player.name }}</td>
-        <td>{{ score.roll_1 }}</td><td>{{ score.roll_2 }}</td><td>{{ score.roll_3 }}</td>
-        <td>{{ score.total_score }}</td>
-    </tr>
-    {% endfor %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Player</th>
+            <th>Roll 1</th>
+            <th>Roll 2</th>
+            <th>Roll 3</th>
+            <th>Total</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for score in keiths_scores %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ score.player.name }}</td>
+            <td>{{ score.roll_1 }}</td>
+            <td>{{ score.roll_2 }}</td>
+            <td>{{ score.roll_3 }}</td>
+            <td>{{ score.total_score }}</td>
+            <td>
+                {% if score.is_strike %}Strike{% elif score.is_spare %}Spare{% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
 
 <h2>{{ game.opponent }} (Cycle: {{ opp_cycle_total }} | Round: {{ opp_round_total }} | Game: {{ opp_game_total }})</h2>
-<table border="1">
-    <tr><th>#</th><th>Player</th><th>Roll 1</th><th>Roll 2</th><th>Roll 3</th><th>Total</th></tr>
-    {% for score in opp_scores %}
-    <tr>
-        <td>{{ score.opponent_player_number }}</td><td>{{ game.opponent }} P{{ score.opponent_player_number }}</td>
-        <td>{{ score.roll_1 }}</td><td>{{ score.roll_2 }}</td><td>{{ score.roll_3 }}</td>
-        <td>{{ score.total_score }}</td>
-    </tr>
-    {% endfor %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Player</th>
+            <th>Roll 1</th>
+            <th>Roll 2</th>
+            <th>Roll 3</th>
+            <th>Total</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for score in opp_scores %}
+        <tr>
+            <td>{{ score.opponent_player_number }}</td>
+            <td>{{ game.opponent }} P{{ score.opponent_player_number }}</td>
+            <td>{{ score.roll_1 }}</td>
+            <td>{{ score.roll_2 }}</td>
+            <td>{{ score.roll_3 }}</td>
+            <td>{{ score.total_score }}</td>
+            <td>
+                {% if score.is_strike %}Strike{% elif score.is_spare %}Spare{% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
 
-<form method="post">
+<h3>Matchups (Round {{ current_round }}, Cycle {{ current_cycle }})</h3>
+<ul class="list-group mb-4">
+    {% for matchup in matchups %}
+    <li class="list-group-item">{{ matchup.keith_name }} ({{ matchup.keith_score }}) vs. {{ matchup.opp_name }} ({{ matchup.opp_score }})</li>
+    {% endfor %}
+</ul>
+
+<form method="post" class="mb-4">
     {% csrf_token %}
-    <label>Keith’s Player:</label> {{ form.player }}
-    <label>{{ game.opponent }} Player:</label> {{ form.opponent_player_number }}
-    <label>Roll 1:</label> {{ form.roll_1 }}
-    <label>Roll 2:</label> {{ form.roll_2 }}
-    <label>Roll 3:</label> {{ form.roll_3 }}
-    {% if game.game_type == "first_pin" %}
-        <label>First Pin Hits:</label> {{ form.first_pin_success }}
-    {% endif %}
-    <button type="submit">Add</button>
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label class="form-label">Keith’s Player:</label>
+            {{ form.player }}
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">{{ game.opponent }} Player:</label>
+            {{ form.opponent_player_number }}
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-2">
+            <label class="form-label">Roll 1:</label>
+            {{ form.roll_1 }}
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Roll 2:</label>
+            {{ form.roll_2 }}
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Roll 3:</label>
+            {{ form.roll_3 }}
+        </div>
+        {% if game.game_type == "first_pin" %}
+        <div class="col-md-2">
+            <label class="form-label">First Pin Hits:</label>
+            {{ form.first_pin_success }}
+        </div>
+        {% endif %}
+    </div>
+    <button type="submit" class="btn btn-primary">Add Score</button>
+    <a href="{% url 'start_live_game' %}" class="btn btn-danger">End Game</a>
 </form>
 {% endblock %}

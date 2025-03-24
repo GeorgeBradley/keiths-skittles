@@ -77,9 +77,9 @@ WSGI_APPLICATION = 'skittles_app.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(default='sqlite:///db.sqlite3')
+    'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
 }
-DATABASES['default']['OPTIONS'] = {'sslmode': 'require'} 
+ALLOWED_HOSTS = ['<your-render-app>.onrender.com', 'localhost', '127.0.0.1'] 
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

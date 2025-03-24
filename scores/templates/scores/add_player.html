@@ -1,0 +1,13 @@
+{% extends "scores/base.html" %}
+{% block content %}
+<h1>Add a Player to Keith’s Team</h1>
+<form method="post" class="mb-4">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="id_name" class="form-label">Player Name:</label>
+        {{ form.name }}
+    </div>
+    <button type="submit" class="btn btn-primary">Add Player</button>
+    <a href="{% url 'start_live_game' %}" class="btn btn-secondary">Back to Scoring</a>
+</form>
+{% endblock %}

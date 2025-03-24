@@ -35,9 +35,14 @@ class Score(models.Model):
     total_score = models.IntegerField(default=0)
     first_pin_success = models.IntegerField(null=True, blank=True)
     opponent_player_number = models.IntegerField(null=True, blank=True)
+    is_strike = models.BooleanField(default=False)
+    is_spare = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
+        total_pins = 9  # Assuming 9-pin skittles
         self.total_score = self.roll_1 + self.roll_2 + self.roll_3
+        self.is_strike = (self.roll_1 == total_pins)
+        self.is_spare = (not self.is_strike and (self.roll_1 + self.roll_2) == total_pins)
         super().save(*args, **kwargs)
 
     def __str__(self):
