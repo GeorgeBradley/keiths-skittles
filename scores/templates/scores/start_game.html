@@ -1,0 +1,42 @@
+{% extends "scores/base.html" %}
+{% block content %}
+<h1>Start a New Game</h1>
+<form method="post" class="mb-4">
+    {% csrf_token %}
+    {% if form.errors %}
+    <div class="alert alert-danger">
+        <ul>
+            {% for field, errors in form.errors.items %}
+            <li>{{ field }}: {{ errors }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    <div class="mb-3">
+        <label for="id_date" class="form-label">Date and Time:</label>
+        {{ form.date }}
+    </div>
+    <div class="mb-3">
+        <label for="id_opponent" class="form-label">Opponent:</label>
+        {{ form.opponent }}
+    </div>
+    <div class="mb-3">
+        <label for="id_location" class="form-label">Location:</label>
+        {{ form.location }}
+    </div>
+    <div class="mb-3">
+        <label for="id_game_type" class="form-label">Game Type:</label>
+        {{ form.game_type }}
+    </div>
+    <div class="mb-3">
+        <label for="id_cycles_per_round" class="form-label">Cycles per Round:</label>
+        {{ form.cycles_per_round }}
+    </div>
+    <div class="mb-3">
+        <label for="id_first_team" class="form-label">Which team goes first?</label>
+        {{ form.first_team }}
+    </div>
+    <button type="submit" class="btn btn-primary">Start Game</button>
+    <a href="{% url 'start_live_game' %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}
