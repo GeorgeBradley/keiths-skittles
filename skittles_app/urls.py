@@ -3,6 +3,7 @@ from django.urls import path
 from scores import views
 from django.shortcuts import redirect
 
+# Redirect root URL to /live/
 def redirect_to_live(request):
     return redirect('start_live_game')
 

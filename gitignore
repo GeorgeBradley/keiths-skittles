@@ -1,5 +1,23 @@
-venv/
-*.pyc
+# Python
 __pycache__/
-db.sqlite3
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+*.env
+
+# Django
 *.log
+*.pot
+*.pyc
+*.sqlite3
+db.sqlite3
+
+# macOS
+.DS_Store
+
+# IDEs
+.vscode/
+.idea/

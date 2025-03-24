@@ -4,7 +4,6 @@ from .models import Game, Score, Player, GamePlayer
 from .forms import ScoreForm, PlayerSelectForm, PlayerForm
 
 def live_game(request, game_id=None):
-    # If no game_id, create a new game
     if not game_id:
         game = Game.objects.create(
             date="2025-03-23 19:00",
@@ -15,13 +14,11 @@ def live_game(request, game_id=None):
         )
         return redirect("live_game", game_id=game.id)
 
-    # Load the game and calculate current round/cycle
     game = Game.objects.get(id=game_id)
     scores = Score.objects.filter(game=game).order_by("round_number", "cycle_number")
     current_round = min(4, (scores.aggregate(Max("round_number"))["round_number__max"] or 0) + 1)
     current_cycle = min(game.cycles_per_round, (scores.filter(round_number=current_round).aggregate(Max("cycle_number"))["cycle_number__max"] or 0) + 1)
 
-    # Check if players are selected for the current round
     round_players = GamePlayer.objects.filter(game=game, round_number=current_round)
     if not round_players and request.method != "POST":
         return render(request, "scores/select_players.html", {
@@ -31,7 +28,6 @@ def live_game(request, game_id=None):
             "form": PlayerSelectForm()
         })
 
-    # Handle form submissions
     if request.method == "POST":
         if "select_players" in request.POST:
             form = PlayerSelectForm(request.POST)
@@ -51,7 +47,6 @@ def live_game(request, game_id=None):
     else:
         form = ScoreForm(initial={"game": game, "round_number": current_round, "cycle_number": current_cycle})
 
-    # Calculate scores and totals
     keiths_scores = scores.filter(player__isnull=False, round_number=current_round, cycle_number=current_cycle)
     opp_scores = scores.filter(player__isnull=True, round_number=current_round, cycle_number=current_cycle)
     keiths_cycle_total = keiths_scores.aggregate(Sum("total_score"))["total_score__sum"] or 0
@@ -61,10 +56,8 @@ def live_game(request, game_id=None):
     keiths_game_total = scores.filter(player__isnull=False).aggregate(Sum("total_score"))["total_score__sum"] or 0
     opp_game_total = scores.filter(player__isnull=True).aggregate(Sum("total_score"))["total_score__sum"] or 0
 
-    # Running score differential
     score_differential = keiths_game_total - opp_game_total
 
-    # Player matchup comparison
     matchups = []
     keiths_players = list(keiths_scores.order_by("id"))
     opp_players = list(opp_scores.order_by("opponent_player_number"))
@@ -78,7 +71,6 @@ def live_game(request, game_id=None):
             "opp_score": opp_player.total_score
         })
 
-    # Render the scoring page
     return render(request, "scores/live_game.html", {
         "game": game,
         "keiths_scores": keiths_scores,
@@ -102,7 +94,7 @@ def add_player(request):
         form = PlayerForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect("start_live_game")  # Changed to start_live_game
+            return redirect("start_live_game")
     else:
         form = PlayerForm()
     return render(request, "scores/add_player.html", {"form": form})

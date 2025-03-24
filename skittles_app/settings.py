@@ -12,7 +12,7 @@ DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 # Allow Render domain and local development hosts
 ALLOWED_HOSTS = [
-    'keiths-skittles.onrender.com',  # Add your Render domain
+    'keiths-skittles.onrender.com',
     'localhost',
     '127.0.0.1',
 ]
