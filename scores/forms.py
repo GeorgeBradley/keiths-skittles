@@ -36,11 +36,21 @@ class PlayerSelectForm(forms.ModelForm):
         model = GamePlayer
         fields = []
 
-    def clean_players(self):
-        players = self.cleaned_data.get('players')
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Ensure players field is treated as a list
+        if 'players' in self.data and isinstance(self.data['players'], str):
+            self.data = self.data.copy()
+            self.data.setlist('players', [self.data['players']])
+
+    def clean(self):
+        cleaned_data = super().clean()
+        print("PlayerSelectForm cleaned_data:", cleaned_data)  # Debug
+        players = cleaned_data.get('players')
+        print("Players before validation:", players)  # Debug
         if not players:
             raise forms.ValidationError("You must select at least one player.")
-        return players
+        return cleaned_data
 
 class PlayerForm(forms.ModelForm):
     class Meta:
